@@ -1,19 +1,30 @@
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter
-from requester.models import Account, FTPServerAccount, WebServerAccount, EmailAccount, Area, UTCTimeRange, GOESRequest, \
-	Satellite, Channel, Order, File, AutomaticDownload
+from requester.models import Area, Satellite, Channel
+from requester.models import NOAAAdapt
+from requester.models import Account, FTPServerAccount, WebServerAccount, EmailAccount, GOESRequest, NOAAEMailChecker, NOAAFTPDownloader
+from requester.models.materials import File, Request #, Order
+from factopy.admin import MaterialAdmin, ProcessAdmin, MaterialChildAdmin, ProcessChildAdmin, ComplexProcessChildAdmin
 
+MaterialAdmin.child_models += (
+	(File, MaterialChildAdmin),
+	(Request, MaterialChildAdmin),
+	#(Order, MaterialChildAdmin),
+)
+
+ProcessAdmin.child_models += (
+	(NOAAAdapt, ProcessChildAdmin),
+	(GOESRequest, ProcessChildAdmin),
+	(NOAAEMailChecker, ProcessChildAdmin),
+	(NOAAFTPDownloader, ProcessChildAdmin),
+)
 
 class AreaAdmin(admin.ModelAdmin):
 	list_display = [ 'name', 'north_latitude', 'south_latitude', 'east_longitude', 'west_longitude']
 
 
-class UTCTimeRangeAdmin(admin.ModelAdmin):
-	list_display = ['begin', 'end']
-
-
 class SatelliteAdmin(admin.ModelAdmin):
-	list_display = [ 'name', 'request_server' ]
+	list_display = [ 'name' ]
 
 
 class ChannelAdmin(admin.ModelAdmin):
@@ -33,27 +44,8 @@ class AccountAdmin(PolymorphicParentModelAdmin):
 		(EmailAccount, AccountChildAdmin),
 	)
 
-class OrderAdmin(admin.ModelAdmin):
-	list_display = [ 'identification', 'downloaded', 'year', 'julian_day', 'progress', 'downloaded_porcentage', 'total_time', 'average_speed', 'download_speed' ]
-	search_fields = ['identification']
-
-class RequestAdmin(admin.ModelAdmin):
-	list_display = [ 'identification', 'begin', 'end', 'progress', 'downloaded_porcentage', 'total_time' ]
-
-class FileAdmin(admin.ModelAdmin):
-	list_display = [ 'downloaded', 'downloaded_porcentage', 'progress', 'download_speed', 'filename', 'size', 'begin_download' ]
-	list_filter = ['begin_download', 'end_download', 'size' ]
-	search_fields = ['begin_download', 'end_download', 'size', 'localname']
-
-class AutomaticDownloadAdmin(admin.ModelAdmin):
-	list_display = [ 'paused','title', 'progress', 'time_range', 'area', 'root_path', 'total_time', 'estimated_time', 'average_time' ]
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Area, AreaAdmin)
-admin.site.register(UTCTimeRange, UTCTimeRangeAdmin)
-admin.site.register(GOESRequest, RequestAdmin)
 admin.site.register(Satellite, SatelliteAdmin)
 admin.site.register(Channel, ChannelAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(File, FileAdmin)
-admin.site.register(AutomaticDownload, AutomaticDownloadAdmin)

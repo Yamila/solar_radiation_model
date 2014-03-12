@@ -94,7 +94,7 @@ unattended:
 	@ (sudo ls 2>&1) >> tracking.log
 
 Python$(PYLARGESUFIX_VER):
-	$(call get,Python$(PYLARGESUFIX_VER),Python$(PYLARGESUFIX_VER).tgz,http://www.python.org/ftp/python/$(PYLARGEVERSION))
+	$(call get,Python$(PYLARGESUFIX_VER),Python$(PYLARGESUFIX_VER).tgz,http://legacy.python.org/ftp/python/$(PYLARGEVERSION))
 	$(call compile,Python$(PYLARGESUFIX_VER),$(PYTHONLIBS),--prefix=$(PYPREFIX_PATH) --with-threads --enable-shared)
 
 $(PYTHONPATH): Python$(PYLARGESUFIX_VER)
@@ -167,7 +167,7 @@ bin/activate: imagedownloader/requirements.txt
 	@ echo "[ installing   ] netCDF4 inside $(VIRTUALENV)"
 	@ ($(SOURCE_ACTIVATE) $(EASYINSTALL) netCDF4 2>&1) >> tracking.log
 	@ echo "[ installing   ] $(PIP) requirements"
-	@ (PATH="/usr/local/pgsql/bin:$(PATH)"; $(SOURCE_ACTIVATE) $(PIP) install --default-timeout=100 -r imagedownloader/requirements.txt 2>&1) >> tracking.log
+	@ PATH="/usr/local/pgsql/bin:$(PATH)"; $(SOURCE_ACTIVATE) $(PIP) install --default-timeout=100 -r imagedownloader/requirements.txt 2>&1 | grep Downloading
 	@ touch bin/activate
 
 postgres-requirements:
@@ -192,7 +192,7 @@ defaultsuperuser:
 	@ $(SOURCE_ACTIVATE) cd imagedownloader && ../$(PYTHON) manage.py createsuperuser --username=dev --email=dev@dev.com
 
 run:
-	@ $(SOURCE_ACTIVATE) cd imagedownloader && ../$(PYTHON) manage.py runserver 8000
+	@ $(SOURCE_ACTIVATE) cd imagedownloader && ../$(PYTHON) manage.py runserver 0.0.0.0:8000
 
 runbackend:
 	$(SOURCE_ACTIVATE) cd imagedownloader && ../$(PYTHON) manage.py runbackend 4
